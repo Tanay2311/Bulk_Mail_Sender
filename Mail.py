@@ -1,55 +1,59 @@
-A=input("Enter")
-B=input("Enter")
-C=input("Enter")
-rec=input("Enter the receivers mail address:")
-
-a=f"""Greetings {name},
-
-CONTENT
-
-Var1:{A}
-Var2:{B}
-
-
-Thank You"""
-
 import smtplib
-from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
+import pandas as pd
 
-fromaddr = "xyz@gmail.com"
-toaddr = rec
 
-msg = MIMEMultipart()
+def send_email(name, registration_number, attachment_filename):
+    # Construct the recipient's email address
+    rec = f"{name}.{registration_number}@muj.manipal.edu"
 
-msg['From'] = 'NAME'
-msg['To'] = toaddr
-msg['Subject'] = "COMPLETED"
-body = a
+    # Construct email body
+    body = f"""Dear {name}, 
 
-msg.attach(MIMEText(body, 'plain'))
+    Please Find Attached the NOC for your Long Internship
+    Regards
+    """
 
-filename = "abc.pdf"
-attachment = open("C:\PROGRAMMING\SMTP_PYTHON\abc.pdf", "rb")
+    fromaddr = "tanay.act3@gmail.com"
+    toaddr = rec
 
-p = MIMEBase('application', 'octet-stream')
-p.set_payload((attachment).read())
-encoders.encode_base64(p)
-p.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+    msg = MIMEMultipart()
+    msg['From'] = 'Tanay Shah'
+    msg['To'] = toaddr
+    msg['Subject'] = "No Objection Certificate"
+    msg.attach(MIMEText(body, 'plain'))
 
-msg.attach(p)
+    # Attach the specified attachment file for the current recipient
+    with open(f"/Users/tanay/Documents/TANAY/TECH/Certificate_Automation/NOC/{attachment_filename}", "rb") as attachment_file:
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload(attachment_file.read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', f'attachment; filename= {attachment_filename}')
+        msg.attach(part)
 
-s = smtplib.SMTP('smtp.gmail.com', 587)
+    # Send email
+    s = smtplib.SMTP('smtp.gmail.com', 587)
+    s.starttls()
+    s.login(fromaddr, "fmlwszthqutdthqb")
+    text = msg.as_string()
+    s.sendmail(fromaddr, toaddr, text)
+    s.quit()
 
-s.starttls()
 
-s.login(fromaddr, "fmlwszthqutdthqb")
+def process_excel_data():
+    # Read data from Excel file
+    df = pd.read_excel("data.xlsx")
 
-text = msg.as_string()
+    # Iterate over each row in the DataFrame
+    for index, row in df.iterrows():
+        name = row['NAME']
+        registration_number = row['REGISTRATION NUMBER']
+        attachment_filename = f"{name}_{registration_number}.pdf"  # Assuming PDF files
+        send_email(name, registration_number, attachment_filename)
 
-s.sendmail(fromaddr, toaddr, text)
 
-s.quit()
+if __name__ == "__main__":
+    process_excel_data()
