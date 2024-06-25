@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a high-performance bulk email sender built using Python, CSV Parser, MIME, and SMTP libraries. Developed in 2022, it offers efficient handling of large CSV lists with enhanced throughput and reliability.
+This project is a high-performance bulk email sender built using Python, CSV Parser, MIME, and SMTP libraries. It offers efficient handling of large CSV lists with enhanced throughput and reliability.
 
 ## Key Features
 
